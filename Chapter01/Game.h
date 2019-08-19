@@ -7,8 +7,12 @@
 // ----------------------------------------------------------------
 
 #pragma once
-#include "SDL/SDL.h"
-#include "SDL/SDL_ttf.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <conio.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_ttf.h>
+#include <string>
 #include <vector>
 // Vector2 struct just stores x/y coordinates
 // (for now)
@@ -44,20 +48,28 @@ private:
 	void ProcessInput();
 	void UpdateGame();
 	void GenerateOutput();
+	void RandomVel(Vector2 &Vel);
 	// Window created by SDL
 	SDL_Window* mWindow;
 	// Renderer for 2D drawing
 	SDL_Renderer* mRenderer;
-
+	//Score Board
+	int score_P1 = 0;
+	int score_P2 = 0;
+	std::string theScore_P1;
+	std::string theScore_P2;
+	SDL_Rect Score_board;
 	// Number of ticks since start of game
 	Uint32 mTicksCount;
-	std::vector<Ball> Balls{
+	std::vector<Ball> Balls{ 
 		{{1024.0f / 2.0f,768.0f / 2.0f},
 		{-200.0f,235.0f}},
-		{{1000.0f / 2.0f,700.0f / 2.0f},
-		{-200.0f,-235.0f}},
-		{{926.0f / 2.0f,766.0f / 2.0f},
-		{200.0f,-235.0f}}
+		{{1024.0f / 2.0f,768.0f / 2.0f},
+		{-200.0f,235.0f}},
+		{{1024.0f / 2.0f,768.0f / 2.0f},
+		{-200.0f,235.0f}},
+		{{1024.0f / 2.0f,768.0f / 2.0f},
+		{-200.0f,235.0f}}
 	};
 	// Pong specific
 	// Direction of paddle
@@ -67,10 +79,14 @@ private:
 	Vector2 mPaddleP1Pos;
 	// Position of paddle
 	Vector2 mPaddleP2Pos;
-	// Position of ball
-	Vector2 mBallPos;
-	// Velocity of ball
-	Vector2 mBallVel;
+	//surface to render score
+	SDL_Surface * surface;
+	SDL_Texture * texture;
+	//Draw Balls
+	void DrawCircle(SDL_Renderer * renderer, int32_t centerX, int32_t centerY, int32_t radius);
+
+	TTF_Font * font;
+	SDL_Color color;
 	const int thickness = 15;
 	const float paddleH = 100.0f;
 };

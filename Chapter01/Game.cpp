@@ -15,7 +15,6 @@ Game::Game()
 ,mRenderer(nullptr)
 ,mTicksCount(0)
 ,mIsRunning(true)
-,mPaddleDir_P1(0)
 {
 	
 }
@@ -24,6 +23,7 @@ bool Game::Initialize()
 {
 	// Initialize SDL
 	int sdlResult = SDL_Init(SDL_INIT_VIDEO);
+	TTF_Init();
 	if (sdlResult != 0)
 	{
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
@@ -58,15 +58,17 @@ bool Game::Initialize()
 		SDL_Log("Failed to create renderer: %s", SDL_GetError());
 		return false;
 	}
+	font = TTF_OpenFont("res/ObelixPro-cyr.ttf", 90);
+	if (!font) {
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		return false;
+	}
+	color = { 255, 255, 255, 255 };
 	//
 	mPaddleP1Pos.x = 10.0f;
 	mPaddleP1Pos.y = 768.0f/2.0f;
 	mPaddleP2Pos.x = 999.0f;
 	mPaddleP2Pos.y = 768.0f / 2.0f;
-	//Balls[i].Pos.x = 1024.0f/2.0f;
-	//Balls[i].Pos.y = 768.0f/2.0f;
-	//Balls[i].Vel.x = -200.0f;
-	//Balls[i].Vel.y = 235.0f;
 	return true;
 }
 
@@ -77,6 +79,7 @@ void Game::RunLoop()
 		ProcessInput();
 		UpdateGame();
 		GenerateOutput();
+
 	}
 
 }
@@ -185,18 +188,31 @@ void Game::UpdateGame()
 			// Our y-difference is small enough
 			diff_1 <= paddleH / 2.0f &&
 			// We are in the correct x-position
-			Balls[i].Pos.x <= 25.0f && Balls[i].Pos.x >= 20.0f &&
+			Balls[i].Pos.x <= 40.0f && Balls[i].Pos.x >= 35.0f &&
 			// The ball is moving to the left
 			Balls[i].Vel.x < 0.0f)
 		{
 			Balls[i].Vel.x *= -1.0f;
+			RandomVel(Balls[i].Vel);
 		}
 		// Did the ball go off the screen? (if so, end game)
-		else if (Balls[i].Pos.x <= 0.0f || Balls[i].Pos.x >= 1024.0f)
+		else if (Balls[i].Pos.x <= 0.0f + thickness&&
+			Balls[i].Vel.x < 0.0f)
 		{
-			mIsRunning = false;
+			//mIsRunning = false;
+			score_P2++;
+			Balls[i].Vel.x *= -1;
+			RandomVel(Balls[i].Vel);
+
 		}
-		// Did the ball collide with the right wall?
+		else if (Balls[i].Pos.x >= 1024.0f - thickness &&
+			Balls[i].Vel.x > 0.0f)
+		{
+			score_P1++;
+			Balls[i].Vel.x *= -1;
+			RandomVel(Balls[i].Vel);
+		}
+		
 		else if (// Our y-difference is small enough
 			diff_2 <= paddleH / 2.0f &&
 			// We are in the correct x-position
@@ -205,18 +221,21 @@ void Game::UpdateGame()
 			Balls[i].Vel.x > 0.0f)
 		{
 			Balls[i].Vel.x *= -1.0f;
+			RandomVel(Balls[i].Vel);
 		}
 
 		// Did the ball collide with the top wall?
 		if (Balls[i].Pos.y <= thickness && Balls[i].Vel.y < 0.0f)
 		{
 			Balls[i].Vel.y *= -1;
+			RandomVel(Balls[i].Vel);
 		}
 		// Did the ball collide with the bottom wall?
 		else if (Balls[i].Pos.y >= (768 - thickness) &&
 			Balls[i].Vel.y > 0.0f)
 		{
 			Balls[i].Vel.y *= -1;
+			RandomVel(Balls[i].Vel);
 		}
 	}
 	
@@ -276,28 +295,94 @@ void Game::GenerateOutput()
 	// Draw ball
 	for (int i = 0; i < Balls.size(); i++)
 	{
-	SDL_Rect ball{	
+	/*SDL_Rect ball{	
 		static_cast<int>(Balls[i].Pos.x - thickness/2),
 		static_cast<int>(Balls[i].Pos.y - thickness/2),
 		thickness,
 		thickness
 	};
-	SDL_RenderFillRect(mRenderer, &ball);
+	SDL_RenderFillRect(mRenderer, &ball);*/
+		DrawCircle(mRenderer, static_cast<int>(Balls[i].Pos.x - thickness / 2), static_cast<int>(Balls[i].Pos.y - thickness / 2), thickness);
 	}
-
 	
+	theScore_P1 = std::to_string(score_P1);
+	theScore_P2 = std::to_string(score_P2);
+
+	surface = TTF_RenderText_Solid(font, theScore_P1.c_str(), color); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
+	texture = SDL_CreateTextureFromSurface(mRenderer, surface); //now you can convert it into a texture
+
+	SDL_FreeSurface(surface);
+
+	Score_board.x = 10;  
+	Score_board.y = 20; 
+	Score_board.w = 50; 
+	Score_board.h = 50; 
+
+	SDL_RenderCopy(mRenderer, texture, NULL, &Score_board);
+	SDL_DestroyTexture(texture);
+	surface = TTF_RenderText_Solid(font, theScore_P2.c_str(), color); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
+	texture = SDL_CreateTextureFromSurface(mRenderer, surface); //now you can convert it into a texture
+	SDL_FreeSurface(surface);
+	Score_board.x = 964;
+	Score_board.y = 20;
+	Score_board.w = 50;
+	Score_board.h = 50;
+	SDL_RenderCopy(mRenderer, texture, NULL, &Score_board);
+	SDL_DestroyTexture(texture);
+
 	// Swap front buffer and back buffer
 	SDL_RenderPresent(mRenderer);
+	SDL_RenderClear(mRenderer);
+}
+
+void Game::RandomVel(Vector2 &Vel) // Vel default: x: 200.0f, y: 235.0f
+{
+	if (Vel.x > 0)
+	{
+		Vel.x = (rand() % (230 + 1 - 180)) + 180;
+	}
+	else
+	{
+		Vel.x = ((rand() % (230 + 1 - 180)) + 180)*(-1);
+	}
+	if (Vel.y > 0)
+	{
+		Vel.y = (rand() % (260 + 1 - 200)) + 200;
+	}
+	else
+	{
+		Vel.y = ((rand() % (260 + 1 - 200)) + 200)*(-1);
+	}
+}
+
+void Game::DrawCircle(SDL_Renderer * renderer, int32_t centerX, int32_t centerY, int32_t radius)
+{
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+	for (int w = 0; w < radius * 2; w++)
+	{
+		for (int h = 0; h < radius * 2; h++)
+		{
+			int x = radius - w;
+			int y = radius - h; 
+			if ((x*x + y*y) <= (radius * radius))
+			{
+				SDL_RenderDrawPoint(renderer, centerX + x, centerY + y);
+			}
+		}
+	}
 }
 
 void Game::Close()
 {
 	SDL_DestroyRenderer(mRenderer);
 	SDL_DestroyWindow(mWindow);
+	TTF_CloseFont(font);
 }
 
 void Game::Shutdown()
 {
+	TTF_Quit();
 	SDL_Quit();
 }
 
