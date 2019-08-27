@@ -1,21 +1,35 @@
 #include "TileMapComp.h"
 
 
+
+
+TileMapComp::TileMapComp(Actor * owner, int drawOrder):SpriteComponent(owner)
+{
+}
+
 void TileMapComp::parseCSV(std::string path,int sizeX,int SizeY)
 {
-	std::ifstream  data(path);
-	std::string line;
-	while (std::getline(data, line))
-	{
-		std::stringstream lineStream(line);
-		std::string cell;
-		std::vector<std::string> parsedRow;
-		while (std::getline(lineStream, cell, ','))
-		{
-			parsedRow.push_back(cell);
-		}
+	std::ifstream file("sheet.csv");
 
-		parsedCsv.push_back(parsedRow);
+	for (int row = 0; row < 24; ++row)
+	{
+		std::string line;
+		std::getline(file, line);
+		if (!file.good())
+			break;
+
+		std::stringstream iss(line);
+
+		for (int col = 0; col < 32; ++col)
+		{
+			std::string val;
+			std::getline(iss, val, ',');
+			if (!iss.good())
+				break;
+
+			std::stringstream convertor(val);
+			convertor >> tile[row][col];
+		}
 	}
 }
 
@@ -26,4 +40,7 @@ void TileMapComp::AddTile(int id, int x, int y)
 
 void TileMapComp::Draw(SDL_Renderer * renderer)
 {
+
 }
+
+
