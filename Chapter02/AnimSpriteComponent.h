@@ -9,9 +9,11 @@
 #pragma once
 #include "SpriteComponent.h"
 #include <vector>
+#include <map>
 class AnimSpriteComponent : public SpriteComponent
 {
 public:
+	std::map<const char*, SDL_Texture*> animations;
 	AnimSpriteComponent(class Actor* owner, int drawOrder = 100);
 	// Update animation every frame (overriden from component)
 	void Update(float deltaTime) override;
@@ -20,6 +22,8 @@ public:
 	// Set/get the animation FPS
 	float GetAnimFPS() const { return mAnimFPS; }
 	void SetAnimFPS(float fps) { mAnimFPS = fps; }
+	//anim selection
+	int animIndex = 0;
 private:
 	// All textures in the animation
 	std::vector<SDL_Texture*> mAnimTextures;
@@ -27,4 +31,8 @@ private:
 	float mCurrFrame;
 	// Animation frame rate
 	float mAnimFPS;
+	SDL_Rect srcRect;
+
+public:
+
 };

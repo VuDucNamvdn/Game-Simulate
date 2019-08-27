@@ -1,56 +1,41 @@
-// ----------------------------------------------------------------
-// From Game Programming in C++ by Sanjay Madhav
-// Copyright (C) 2017 Sanjay Madhav. All rights reserved.
-// 
-// Released under the BSD License
-// See LICENSE in root directory for full details.
-// ----------------------------------------------------------------
-
-#include "Ship.h"
-#include "AnimSpriteComponent.h"
+#include "Character.h"
 #include "Game.h"
 
-Ship::Ship(Game* game)
-	:Actor(game)
-	,mRightSpeed(0.0f)
-	,mDownSpeed(0.0f)
+
+Character::Character(Game* game): Actor(game), mRightSpeed(0.0f)
+, mDownSpeed(0.0f)
 {
 	// Create an animated sprite component
-	AnimSpriteComponent* asc = new AnimSpriteComponent(this);
-	std::vector<SDL_Texture*> anims = {
-		game->GetTexture("Assets/Ship01.png"),
-		game->GetTexture("Assets/Ship02.png"),
-		game->GetTexture("Assets/Ship03.png"),
-		game->GetTexture("Assets/Ship04.png"),
-		/*game->GetTexture("Assets/Enemy01.png"),
-		game->GetTexture("Assets/Enemy02.png"),
-		game->GetTexture("Assets/Enemy03.png"),
-		game->GetTexture("Assets/Enemy04.png"),
-		game->GetTexture("Assets/Enemy05.png"),
-		game->GetTexture("Assets/Enemy06.png"),*/
-		/*game->GetTexture("Assets/Character01.png"),
+	asc = new AnimSpriteComponent(this);
+	std::vector<SDL_Texture*> Idle = {
+		game->GetTexture("Assets/Character01.png"),
 		game->GetTexture("Assets/Character02.png"),
 		game->GetTexture("Assets/Character03.png"),
 		game->GetTexture("Assets/Character04.png"),
 		game->GetTexture("Assets/Character05.png"),
 		game->GetTexture("Assets/Character06.png"),
+	};
+	std::vector<SDL_Texture*> Jump = {
 		game->GetTexture("Assets/Character07.png"),
 		game->GetTexture("Assets/Character08.png"),
 		game->GetTexture("Assets/Character09.png"),
 		game->GetTexture("Assets/Character10.png"),
 		game->GetTexture("Assets/Character11.png"),
 		game->GetTexture("Assets/Character12.png"),
-		game->GetTexture("Assets/Character13.png"),
-		game->GetTexture("Assets/Character14.png"),
-		game->GetTexture("Assets/Character15.png"),
+	};
+	std::vector<SDL_Texture*> Punch = {
 		game->GetTexture("Assets/Character16.png"),
 		game->GetTexture("Assets/Character17.png"),
-		game->GetTexture("Assets/Character18.png"),*/
+		game->GetTexture("Assets/Character18.png"),
 	};
-	asc->SetAnimTextures(anims);
+	animations.emplace("Idle", Idle);
+	animations.emplace("Jump", Jump);
+	animations.emplace("Punch", Punch);
+
+	asc->SetAnimTextures(Idle);
 }
 
-void Ship::UpdateActor(float deltaTime)
+void Character::UpdateActor(float deltaTime)
 {
 	Actor::UpdateActor(deltaTime);
 	// Update position based on speeds and delta time
@@ -75,9 +60,11 @@ void Ship::UpdateActor(float deltaTime)
 		pos.y = 743.0f;
 	}
 	SetPosition(pos);
+	
+
 }
 
-void Ship::ProcessKeyboard(const uint8_t* state)
+void Character::ProcessKeyboard(const uint8_t * state)
 {
 	mRightSpeed = 0.0f;
 	mDownSpeed = 0.0f;
@@ -85,6 +72,7 @@ void Ship::ProcessKeyboard(const uint8_t* state)
 	if (state[SDL_SCANCODE_D])
 	{
 		mRightSpeed += 250.0f;
+
 	}
 	if (state[SDL_SCANCODE_A])
 	{
@@ -99,4 +87,24 @@ void Ship::ProcessKeyboard(const uint8_t* state)
 	{
 		mDownSpeed -= 300.0f;
 	}
+	if (state[SDL_SCANCODE_SPACE])
+	{
+		PlayAnim("Jump");
+	}
+	else if (state[SDL_SCANCODE_T])
+	{
+		PlayAnim("Punch");
+	}
+	else
+	{
+		PlayAnim("Idle");
+	}
+	
 }
+
+void Character::PlayAnim(const char * animName)
+{
+	asc->SetAnimTextures(animations[animName]);
+}
+
+
