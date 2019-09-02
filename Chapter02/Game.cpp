@@ -73,24 +73,28 @@ void Game::LoadData()
 	// Create actor for the background (this doesn't need a subclass)
 	Actor* temp = new Actor(this);
 	temp->SetPosition(Vector2(512.0f, 384.0f));
-	// Create the "far back" background
-	BGSpriteComponent* bg = new BGSpriteComponent(temp);
-	bg->SetScreenSize(Vector2(1024.0f, 768.0f));
-	std::vector<SDL_Texture*> bgtexs = {
-		GetTexture("Assets/Farback01.png"),
-		GetTexture("Assets/Farback02.png")
-	};
-	bg->SetBGTextures(bgtexs);
-	bg->SetScrollSpeed(-100.0f);
-	// Create the closer background
-	bg = new BGSpriteComponent(temp, 50);
-	bg->SetScreenSize(Vector2(1024.0f, 768.0f));
-	bgtexs = {
-		GetTexture("Assets/Stars.png"),
-		GetTexture("Assets/Stars.png")
-	};
-	bg->SetBGTextures(bgtexs);
-	bg->SetScrollSpeed(-200.0f);
+	//map
+	map = new TileMapComp(temp);
+	//map->parseCSV("assets/MapLayer1.csv");
+	tiles = GetTexture("assets/Tiles.png");
+	//// Create the "far back" background
+	//BGSpriteComponent* bg = new BGSpriteComponent(temp);
+	//bg->SetScreenSize(Vector2(1024.0f, 768.0f));
+	//std::vector<SDL_Texture*> bgtexs = {
+	//	GetTexture("Assets/Farback01.png"),
+	//	GetTexture("Assets/Farback02.png")
+	//};
+	//bg->SetBGTextures(bgtexs);
+	//bg->SetScrollSpeed(-100.0f);
+	//// Create the closer background
+	//bg = new BGSpriteComponent(temp, 50);
+	//bg->SetScreenSize(Vector2(1024.0f, 768.0f));
+	//bgtexs = {
+	//	GetTexture("Assets/Stars.png"),
+	//	GetTexture("Assets/Stars.png")
+	//};
+	//bg->SetBGTextures(bgtexs);
+	//bg->SetScrollSpeed(-200.0f);
 }
 
 void Game::RunLoop()
@@ -176,7 +180,7 @@ void Game::GenerateOutput()
 {
 	SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
 	SDL_RenderClear(mRenderer);
-	
+	map->render(tiles, mRenderer);
 	// Draw all sprite components
 	for (auto sprite : mSprites)
 	{

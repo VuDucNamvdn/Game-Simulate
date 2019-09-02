@@ -55,4 +55,6 @@ private:
 	// Game-specific
 	class Ship* mShip; // Player's ship
 	class Character* mCharacter;
+	class TileMapComp* map;
+	SDL_Texture* tiles;
 };
