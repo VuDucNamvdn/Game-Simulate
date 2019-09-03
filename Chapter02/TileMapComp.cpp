@@ -3,9 +3,10 @@
 
 
 
-TileMapComp::TileMapComp(Actor * owner):SpriteComponent(owner)
+TileMapComp::TileMapComp(Actor * owner, float scrolls):SpriteComponent(owner)
 {
-
+	scroll = scrolls;
+	scrolling = scrolls;
 }
 
 void TileMapComp::parseCSV(std::string path)
@@ -48,30 +49,41 @@ void TileMapComp::render(SDL_Texture* mTexture,SDL_Renderer * ren)
 		printf("Failed to load tile set texture Tiles!\n");
 		return;
 	}
+
 	for (int row = 0; row < 24; ++row)
 	{
 		for (int col = 0; col < 32; ++col)
 		{
+			if (scroll<3072)
+			{
+				scrolling -= 0.02f;
+				if (scrolling <= -3072 + scroll)
+				{
+					scrolling = scroll;
+				}
+			}
+			else
+			{
+				scrolling -= 0.02f;
+				if (scrolling <= -4096 + scroll)
+				{
+					scrolling = scroll-1024;
+				}
+			}
+			int k = 32;
 			//Set rendering space and render to screen
-			SDL_Rect renderQuad = { row*64, col*64, 64, 64 };
+			SDL_Rect renderQuad = {(float)(col*k+scrolling), row*k, k, k };
 
 			map.w = 32;
 			map.h = 32;
-			//Set clip rendering dimensions
-			if (&map != NULL)
-			{
-				renderQuad.w = 2*map.w;
-				renderQuad.h = 2*map.h;
-			}
 			if (tile[row][col]>0)
 			{
-				map.x = tile[row][col];
-				map.y = col*32;
+				map.x = (tile[row][col]%8)*32;
+				map.y = (tile[row][col]/8)*32;
 				//Render to screen
 				SDL_RenderCopyEx(ren, mTexture, &map, &renderQuad, 0.0, NULL, SDL_FLIP_NONE);
 			}
 
-			
 		}
 	}
 

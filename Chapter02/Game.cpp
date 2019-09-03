@@ -74,8 +74,12 @@ void Game::LoadData()
 	Actor* temp = new Actor(this);
 	temp->SetPosition(Vector2(512.0f, 384.0f));
 	//map
-	map = new TileMapComp(temp);
-	//map->parseCSV("assets/MapLayer1.csv");
+	map = new TileMapComp(temp,1024);
+	map->parseCSV("assets/MapLayer1.csv");
+	map2 = new TileMapComp(temp,2048);
+	map2->parseCSV("assets/MapLayer2.csv");
+	map3 = new TileMapComp(temp,3076);
+	map3->parseCSV("assets/MapLayer3.csv");
 	tiles = GetTexture("assets/Tiles.png");
 	//// Create the "far back" background
 	//BGSpriteComponent* bg = new BGSpriteComponent(temp);
@@ -180,6 +184,8 @@ void Game::GenerateOutput()
 {
 	SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
 	SDL_RenderClear(mRenderer);
+	map3->render(tiles, mRenderer);
+	map2->render(tiles, mRenderer);
 	map->render(tiles, mRenderer);
 	// Draw all sprite components
 	for (auto sprite : mSprites)
