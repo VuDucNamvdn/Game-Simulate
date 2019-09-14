@@ -14,7 +14,6 @@
 #include "Ship.h"
 #include "Asteroid.h"
 #include "Random.h"
-
 Game::Game()
 :mWindow(nullptr)
 ,mRenderer(nullptr)
@@ -31,7 +30,7 @@ bool Game::Initialize()
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
 		return false;
 	}
-	
+	TTF_Init();
 	mWindow = SDL_CreateWindow("Game Programming in C++ (Chapter 3)", 100, 100, 1024, 768, 0);
 	if (!mWindow)
 	{
@@ -51,7 +50,13 @@ bool Game::Initialize()
 		SDL_Log("Unable to initialize SDL_image: %s", SDL_GetError());
 		return false;
 	}
-
+	font = TTF_OpenFont("res/ObelixProBIt-cyr.ttf", 100);
+	if (!font) {
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		return false;
+	}
+	color = { 25, 25, 25, 255 };
+	score = 0;
 	Random::Init();
 
 	LoadData();
@@ -136,7 +141,10 @@ void Game::UpdateGame()
 			deadActors.emplace_back(actor);
 		}
 	}
-
+	if (mShip->GetState()==Actor::EDead)
+	{
+		mIsRunning = false;
+	}
 	// Delete dead actors (which removes them from mActors)
 	for (auto actor : deadActors)
 	{
@@ -154,7 +162,18 @@ void Game::GenerateOutput()
 	{
 		sprite->Draw(mRenderer);
 	}
+	
+	std::string theScore = std::to_string(score);
 
+	mSurface = TTF_RenderText_Solid(font, theScore.c_str(), color); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
+	mTexture = SDL_CreateTextureFromSurface(mRenderer, mSurface);
+	SDL_Rect Score_board;
+	Score_board.x = 20;
+	Score_board.y = 20;
+	Score_board.w = 15;
+	Score_board.h = 15;
+
+	SDL_RenderCopy(mRenderer, mTexture, NULL, &Score_board);
 	SDL_RenderPresent(mRenderer);
 }
 
@@ -235,6 +254,10 @@ void Game::RemoveAsteroid(Asteroid* ast)
 	if (iter != mAsteroids.end())
 	{
 		mAsteroids.erase(iter);
+	}
+	if (mIsRunning)
+	{
+		new Asteroid(this);
 	}
 }
 

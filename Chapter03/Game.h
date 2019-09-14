@@ -7,8 +7,12 @@
 // ----------------------------------------------------------------
 
 #pragma once
-#include "SDL/SDL.h"
 #include <unordered_map>
+#include <stdlib.h>
+#include <stdio.h>
+#include <conio.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_ttf.h>
 #include <string>
 #include <vector>
 
@@ -32,6 +36,7 @@ public:
 	void AddAsteroid(class Asteroid* ast);
 	void RemoveAsteroid(class Asteroid* ast);
 	std::vector<class Asteroid*>& GetAsteroids() { return mAsteroids; }
+	int score;
 private:
 	void ProcessInput();
 	void UpdateGame();
@@ -60,4 +65,9 @@ private:
 	// Game-specific
 	class Ship* mShip; // Player's ship
 	std::vector<class Asteroid*> mAsteroids;
+	//surface to render score
+	SDL_Surface * mSurface;
+	SDL_Texture * mTexture;
+	TTF_Font * font;
+	SDL_Color color;
 };

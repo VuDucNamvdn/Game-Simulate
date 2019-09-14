@@ -16,38 +16,14 @@ Ship::Ship(Game* game)
 	,mDownSpeed(0.0f)
 {
 	// Create an animated sprite component
-	AnimSpriteComponent* asc = new AnimSpriteComponent(this);
+	asc = new AnimSpriteComponent(this);
 	std::vector<SDL_Texture*> anims = {
 		game->GetTexture("Assets/Ship01.png"),
 		game->GetTexture("Assets/Ship02.png"),
 		game->GetTexture("Assets/Ship03.png"),
 		game->GetTexture("Assets/Ship04.png"),
-		/*game->GetTexture("Assets/Enemy01.png"),
-		game->GetTexture("Assets/Enemy02.png"),
-		game->GetTexture("Assets/Enemy03.png"),
-		game->GetTexture("Assets/Enemy04.png"),
-		game->GetTexture("Assets/Enemy05.png"),
-		game->GetTexture("Assets/Enemy06.png"),*/
-		/*game->GetTexture("Assets/Character01.png"),
-		game->GetTexture("Assets/Character02.png"),
-		game->GetTexture("Assets/Character03.png"),
-		game->GetTexture("Assets/Character04.png"),
-		game->GetTexture("Assets/Character05.png"),
-		game->GetTexture("Assets/Character06.png"),
-		game->GetTexture("Assets/Character07.png"),
-		game->GetTexture("Assets/Character08.png"),
-		game->GetTexture("Assets/Character09.png"),
-		game->GetTexture("Assets/Character10.png"),
-		game->GetTexture("Assets/Character11.png"),
-		game->GetTexture("Assets/Character12.png"),
-		game->GetTexture("Assets/Character13.png"),
-		game->GetTexture("Assets/Character14.png"),
-		game->GetTexture("Assets/Character15.png"),
-		game->GetTexture("Assets/Character16.png"),
-		game->GetTexture("Assets/Character17.png"),
-		game->GetTexture("Assets/Character18.png"),*/
 	};
-	asc->SetAnimTextures(anims);
+	asc->animations.emplace("Idle", anims);
 }
 
 void Ship::UpdateActor(float deltaTime)
@@ -98,5 +74,10 @@ void Ship::ProcessKeyboard(const uint8_t* state)
 	if (state[SDL_SCANCODE_W])
 	{
 		mDownSpeed -= 300.0f;
+		asc->PlayAnim("Idle");
+	}
+	else
+	{
+		asc->PlayAnim("Idle");
 	}
 }

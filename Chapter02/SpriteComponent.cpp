@@ -18,6 +18,7 @@ SpriteComponent::SpriteComponent(Actor* owner, int drawOrder)
 	,mTexHeight(0)
 {
 	mOwner->GetGame()->AddSprite(this);
+	flip = SDL_FLIP_NONE;
 }
 
 SpriteComponent::~SpriteComponent()
@@ -44,7 +45,7 @@ void SpriteComponent::Draw(SDL_Renderer* renderer)
 			&r,
 			-Math::ToDegrees(mOwner->GetRotation()),
 			nullptr,
-			SDL_FLIP_NONE);
+			flip);
 	}
 }
 

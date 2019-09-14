@@ -18,8 +18,9 @@ private:
 public:
 
 	//Shows the tile
-	void render(SDL_Texture* mTexture,SDL_Renderer* ren);
-
+	void render(SDL_Texture* mTexture);
+	//draw
+	void Draw(SDL_Renderer* renderer) override;
 	//Get the tile type
 	int getType();
 
@@ -30,7 +31,7 @@ public:
 private:
 	//The attributes of the tile
 	SDL_Rect mBox;
-
+	SDL_Texture* gTex;
 	float scrolling=0;
 	//The tile type
 	int mType;

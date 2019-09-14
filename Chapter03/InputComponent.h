@@ -17,7 +17,8 @@ public:
 	InputComponent(class Actor* owner);
 
 	void ProcessInput(const uint8_t* keyState) override;
-	
+	// Calculate forward speed for MoveComponent
+	float forwardSpeed = 0.0f;
 	// Getters/setters for private variables
 	float GetMaxForward() const { return mMaxForwardSpeed; }
 	float GetMaxAngular() const { return mMaxAngularSpeed; }

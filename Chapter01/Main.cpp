@@ -18,17 +18,6 @@ int main(int argc, char** argv)
 		game.RunLoop();
 	}
 	game.Close();
-	//SDL_Log("Do you wanna play again?\n1.Yes\n2.No");
-	//char n;
-	//std::cin >> n;
-	//switch (n)
-	//{
-	//case 1:
-	//	game.mIsRunning = true;
-	//	main(argc, argv);
-	//default:
-	//	game.Shutdown();
-	//}
 	game.Shutdown();
 	return 0;
 }

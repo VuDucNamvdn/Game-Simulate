@@ -48,7 +48,7 @@ private:
 	void ProcessInput();
 	void UpdateGame();
 	void GenerateOutput();
-	void RandomVel(Vector2 &Vel);
+	void RandomVel(Vector2 &Vel,float driff);
 	// Window created by SDL
 	SDL_Window* mWindow;
 	// Renderer for 2D drawing
@@ -61,16 +61,6 @@ private:
 	SDL_Rect Score_board;
 	// Number of ticks since start of game
 	Uint32 mTicksCount;
-	std::vector<Ball> Balls{ 
-		{{1024.0f / 2.0f,768.0f / 2.0f},
-		{-200.0f,235.0f}},
-		{{1024.0f / 2.0f,768.0f / 2.0f},
-		{-200.0f,235.0f}},
-		{{1024.0f / 2.0f,768.0f / 2.0f},
-		{-200.0f,235.0f}},
-		{{1024.0f / 2.0f,768.0f / 2.0f},
-		{-200.0f,235.0f}}
-	};
 	// Pong specific
 	// Direction of paddle
 	int mPaddleDir_P1;
@@ -89,4 +79,16 @@ private:
 	SDL_Color color;
 	const int thickness = 15;
 	const float paddleH = 100.0f;
+	const int width = 1024;
+	const int height = 608;
+	std::vector<Ball> Balls{
+		{{(float)width / 2.0f,(float)height / 2.0f},
+		{-200.0f,235.0f}},
+		{{(float)width / 2.0f,(float)height / 2.0f},
+		{-200.0f,235.0f}},
+		{{(float)width / 2.0f,(float)height / 2.0f},
+		{-200.0f,235.0f}},
+		{{(float)width / 2.0f,(float)height / 2.0f},
+		{-200.0f,235.0f}}
+	};
 };

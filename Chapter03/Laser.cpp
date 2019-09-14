@@ -22,7 +22,7 @@ Laser::Laser(Game* game)
 	sc->SetTexture(game->GetTexture("Assets/Laser.png"));
 
 	// Create a move component, and set a forward speed
-	MoveComponent* mc = new MoveComponent(this);
+	mc = new MoveComponent(this);
 	mc->SetForwardSpeed(800.0f);
 
 	// Create a circle component (for collision)
@@ -49,6 +49,7 @@ void Laser::UpdateActor(float deltaTime)
 				// set ourselves and the asteroid to dead
 				SetState(EDead);
 				ast->SetState(EDead);
+				GetGame()->score += 10;
 				break;
 			}
 		}

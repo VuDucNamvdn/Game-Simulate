@@ -35,8 +35,8 @@ bool Game::Initialize()
 		"Ping Pong", // Window title
 		100,	// Top left x-coordinate of window
 		100,	// Top left y-coordinate of window
-		1024,	// Width of window
-		768,	// Height of window
+		width,	// Width of window
+		height,	// Height of window
 		0		// Flags (0 for no flags set)
 	);
 
@@ -58,17 +58,18 @@ bool Game::Initialize()
 		SDL_Log("Failed to create renderer: %s", SDL_GetError());
 		return false;
 	}
-	font = TTF_OpenFont("res/ObelixPro-cyr.ttf", 90);
+	//font = TTF_OpenFont("res/ObelixPro-cyr.ttf", 90);
+	font = TTF_OpenFont("res/ObelixProBIt-cyr.ttf", 90);
 	if (!font) {
 		printf("TTF_OpenFont: %s\n", TTF_GetError());
 		return false;
 	}
 	color = { 255, 255, 255, 255 };
 	//
-	mPaddleP1Pos.x = 10.0f;
-	mPaddleP1Pos.y = 768.0f/2.0f;
-	mPaddleP2Pos.x = 999.0f;
-	mPaddleP2Pos.y = 768.0f / 2.0f;
+	mPaddleP1Pos.x = 0 + thickness;
+	mPaddleP1Pos.y = (float)height/2.0f;
+	mPaddleP2Pos.x = width-thickness*2;
+	mPaddleP2Pos.y = (float)height / 2.0f;
 	return true;
 }
 
@@ -153,9 +154,9 @@ void Game::UpdateGame()
 		{
 			mPaddleP1Pos.y = paddleH/2.0f + thickness;
 		}
-		else if (mPaddleP1Pos.y > (768.0f - paddleH/2.0f - thickness))
+		else if (mPaddleP1Pos.y > ((float)height - paddleH/2.0f - thickness))
 		{
-			mPaddleP1Pos.y = 768.0f - paddleH/2.0f - thickness;
+			mPaddleP1Pos.y = (float)height - paddleH/2.0f - thickness;
 		}
 	}
 	if (mPaddleDir_P2 != 0)
@@ -166,9 +167,9 @@ void Game::UpdateGame()
 		{
 			mPaddleP2Pos.y = paddleH / 2.0f + thickness;
 		}
-		else if (mPaddleP2Pos.y > (768.0f - paddleH / 2.0f - thickness))
+		else if (mPaddleP2Pos.y > ((float)height - paddleH / 2.0f - thickness))
 		{
-			mPaddleP2Pos.y = 768.0f - paddleH / 2.0f - thickness;
+			mPaddleP2Pos.y = (float)height - paddleH / 2.0f - thickness;
 		}
 	}
 	for (int i = 0; i < Balls.size(); i++)
@@ -179,8 +180,8 @@ void Game::UpdateGame()
 
 		// Bounce if needed
 		// Did we intersect with the paddles?
-		float diff_1 = mPaddleP1Pos.y - Balls[i].Pos.y;
-		float diff_2 = mPaddleP2Pos.y - Balls[i].Pos.y;
+		float diff_1 = mPaddleP1Pos.y - (Balls[i].Pos.y - thickness);
+		float diff_2 = mPaddleP2Pos.y - (Balls[i].Pos.y - thickness);
 		// Take absolute value of difference
 		diff_1 = (diff_1 > 0.0f) ? diff_1 : -diff_1;
 		diff_2 = (diff_2 > 0.0f) ? diff_2 : -diff_2;
@@ -188,12 +189,12 @@ void Game::UpdateGame()
 			// Our y-difference is small enough
 			diff_1 <= paddleH / 2.0f &&
 			// We are in the correct x-position
-			Balls[i].Pos.x <= 40.0f && Balls[i].Pos.x >= 35.0f &&
+			Balls[i].Pos.x <= mPaddleP1Pos.x + 2*thickness && Balls[i].Pos.x >= mPaddleP1Pos.x + thickness &&
 			// The ball is moving to the left
 			Balls[i].Vel.x < 0.0f)
 		{
 			Balls[i].Vel.x *= -1.0f;
-			RandomVel(Balls[i].Vel);
+			RandomVel(Balls[i].Vel, 0);
 		}
 		// Did the ball go off the screen? (if so, end game)
 		else if (Balls[i].Pos.x <= 0.0f + thickness&&
@@ -202,40 +203,41 @@ void Game::UpdateGame()
 			//mIsRunning = false;
 			score_P2++;
 			Balls[i].Vel.x *= -1;
-			RandomVel(Balls[i].Vel);
+			RandomVel(Balls[i].Vel,diff_1);
 
 		}
-		else if (Balls[i].Pos.x >= 1024.0f - thickness &&
+		
+		else if (Balls[i].Pos.x >= (float)width - thickness &&
 			Balls[i].Vel.x > 0.0f)
 		{
 			score_P1++;
 			Balls[i].Vel.x *= -1;
-			RandomVel(Balls[i].Vel);
+			RandomVel(Balls[i].Vel, 0);
 		}
 		
 		else if (// Our y-difference is small enough
 			diff_2 <= paddleH / 2.0f &&
 			// We are in the correct x-position
-			Balls[i].Pos.x <= 992.0f && Balls[i].Pos.x >= 984.0f &&
+			Balls[i].Pos.x <= mPaddleP2Pos.x && Balls[i].Pos.x >= mPaddleP2Pos.x - thickness &&
 			// The ball is moving to the left
 			Balls[i].Vel.x > 0.0f)
 		{
 			Balls[i].Vel.x *= -1.0f;
-			RandomVel(Balls[i].Vel);
+			RandomVel(Balls[i].Vel, diff_2);
 		}
 
 		// Did the ball collide with the top wall?
 		if (Balls[i].Pos.y <= thickness && Balls[i].Vel.y < 0.0f)
 		{
 			Balls[i].Vel.y *= -1;
-			RandomVel(Balls[i].Vel);
+			RandomVel(Balls[i].Vel,0);
 		}
 		// Did the ball collide with the bottom wall?
-		else if (Balls[i].Pos.y >= (768 - thickness) &&
+		else if (Balls[i].Pos.y >= ((float) height - thickness) &&
 			Balls[i].Vel.y > 0.0f)
 		{
 			Balls[i].Vel.y *= -1;
-			RandomVel(Balls[i].Vel);
+			RandomVel(Balls[i].Vel,0);
 		}
 	}
 	
@@ -246,7 +248,7 @@ void Game::GenerateOutput()
 	// Set draw color to blue
 	SDL_SetRenderDrawColor(
 		mRenderer,
-		155,	// R
+		0,		// R
 		0,		// G 
 		0,		// B
 		100		// A
@@ -261,13 +263,13 @@ void Game::GenerateOutput()
 	SDL_Rect wall{
 		0,			// Top left x
 		0,			// Top left y
-		1024,		// Width
+		width,		// Width
 		thickness	// Height
 	};
 	SDL_RenderFillRect(mRenderer, &wall);
 	
 	// Draw bottom wall
-	wall.y = 768 - thickness;
+	wall.y = height - thickness;
 	SDL_RenderFillRect(mRenderer, &wall);
 	
 	// Draw right wall
@@ -293,6 +295,7 @@ void Game::GenerateOutput()
 	};
 	SDL_RenderFillRect(mRenderer, &paddle_P2);
 	// Draw ball
+	
 	for (int i = 0; i < Balls.size(); i++)
 	{
 	/*SDL_Rect ball{	
@@ -302,9 +305,13 @@ void Game::GenerateOutput()
 		thickness
 	};
 	SDL_RenderFillRect(mRenderer, &ball);*/
+		int R = (rand() % 255);
+		int G = (rand() % 255);
+		int B = (rand() % 255);
+		SDL_SetRenderDrawColor(mRenderer, R, G, B, 255);
 		DrawCircle(mRenderer, static_cast<int>(Balls[i].Pos.x - thickness / 2), static_cast<int>(Balls[i].Pos.y - thickness / 2), thickness);
 	}
-	
+
 	theScore_P1 = std::to_string(score_P1);
 	theScore_P2 = std::to_string(score_P2);
 
@@ -313,20 +320,18 @@ void Game::GenerateOutput()
 
 	SDL_FreeSurface(surface);
 
-	Score_board.x = 10;  
+	Score_board.x = 20;  
 	Score_board.y = 20; 
-	Score_board.w = 50; 
-	Score_board.h = 50; 
+	Score_board.w = thickness*5; 
+	Score_board.h = thickness*5; 
 
 	SDL_RenderCopy(mRenderer, texture, NULL, &Score_board);
 	SDL_DestroyTexture(texture);
 	surface = TTF_RenderText_Solid(font, theScore_P2.c_str(), color); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
 	texture = SDL_CreateTextureFromSurface(mRenderer, surface); //now you can convert it into a texture
 	SDL_FreeSurface(surface);
-	Score_board.x = 964;
+	Score_board.x = width-Score_board.w-thickness;
 	Score_board.y = 20;
-	Score_board.w = 50;
-	Score_board.h = 50;
 	SDL_RenderCopy(mRenderer, texture, NULL, &Score_board);
 	SDL_DestroyTexture(texture);
 
@@ -335,29 +340,28 @@ void Game::GenerateOutput()
 	SDL_RenderClear(mRenderer);
 }
 
-void Game::RandomVel(Vector2 &Vel) // Vel default: x: 200.0f, y: 235.0f
+void Game::RandomVel(Vector2 &Vel,float driff) // Vel default: x: 200.0f, y: 235.0f
 {
 	if (Vel.x > 0)
 	{
-		Vel.x = (rand() % (230 + 1 - 180)) + 180;
+		Vel.x = (rand() % (230 + 1 - 180)) + 180 + driff;
 	}
 	else
 	{
-		Vel.x = ((rand() % (230 + 1 - 180)) + 180)*(-1);
+		Vel.x = ((rand() % (230 + 1 - 180)) + 180 + driff)*(-1);
 	}
 	if (Vel.y > 0)
 	{
-		Vel.y = (rand() % (260 + 1 - 200)) + 200;
+		Vel.y = (rand() % (260 + 1 - 200)) + 200 + driff;
 	}
 	else
 	{
-		Vel.y = ((rand() % (260 + 1 - 200)) + 200)*(-1);
+		Vel.y = ((rand() % (260 + 1 - 200)) + 200 + driff)*(-1);
 	}
 }
 
 void Game::DrawCircle(SDL_Renderer * renderer, int32_t centerX, int32_t centerY, int32_t radius)
 {
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
 	for (int w = 0; w < radius * 2; w++)
 	{

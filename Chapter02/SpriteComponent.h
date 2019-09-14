@@ -22,6 +22,7 @@ public:
 	int GetDrawOrder() const { return mDrawOrder; }
 	int GetTexHeight() const { return mTexHeight; }
 	int GetTexWidth() const { return mTexWidth; }
+	SDL_RendererFlip flip;
 protected:
 	SDL_Texture* mTexture;
 	int mDrawOrder;

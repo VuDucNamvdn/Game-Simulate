@@ -11,6 +11,8 @@
 #include "InputComponent.h"
 #include "Game.h"
 #include "Laser.h"
+#include "CircleComponent.h"
+#include "Asteroid.h"
 
 Ship::Ship(Game* game)
 	:Actor(game)
@@ -21,18 +23,39 @@ Ship::Ship(Game* game)
 	sc->SetTexture(game->GetTexture("Assets/Ship.png"));
 
 	// Create an input component and set keys/speed
-	InputComponent* ic = new InputComponent(this);
+	ic = new InputComponent(this);
 	ic->SetForwardKey(SDL_SCANCODE_W);
 	ic->SetBackKey(SDL_SCANCODE_S);
 	ic->SetClockwiseKey(SDL_SCANCODE_A);
 	ic->SetCounterClockwiseKey(SDL_SCANCODE_D);
 	ic->SetMaxForwardSpeed(300.0f);
 	ic->SetMaxAngularSpeed(Math::TwoPi);
+
+	// Create a circle component (for collision)
+	mCircle = new CircleComponent(this);
+	mCircle->SetRadius(20.0f);
 }
 
 void Ship::UpdateActor(float deltaTime)
 {
 	mLaserCooldown -= deltaTime;
+	// Do we intersect with an asteroid?
+	for (auto ast : GetGame()->GetAsteroids())
+	{
+		if (Intersect(*mCircle, *(ast->GetCircle())))
+		{
+			// The first asteroid we intersect with,
+			// set ourselves and the asteroid to dead
+			SetScale(GetScale()-0.2f);
+			mCircle->SetRadius(mCircle->GetRadius() - 0.2f);
+			if (GetScale()<=0.2f)
+			{
+				SetState(EDead);
+			}
+			ast->SetState(EDead);
+			break;
+		}
+	}
 }
 
 void Ship::ActorInput(const uint8_t* keyState)
@@ -43,6 +66,22 @@ void Ship::ActorInput(const uint8_t* keyState)
 		Laser* laser = new Laser(GetGame());
 		laser->SetPosition(GetPosition());
 		laser->SetRotation(GetRotation());
+
+		Laser* laser2 = new Laser(GetGame());
+		laser2->SetPosition(GetPosition());
+		laser2->SetRotation(GetRotation()-1);
+
+		Laser* laser3 = new Laser(GetGame());
+		laser3->SetPosition(GetPosition());
+		laser3->SetRotation(GetRotation() - 0.5);
+
+		Laser* laser4 = new Laser(GetGame());
+		laser4->SetPosition(GetPosition());
+		laser4->SetRotation(GetRotation()+1);
+
+		Laser* laser5 = new Laser(GetGame());
+		laser5->SetPosition(GetPosition());
+		laser5->SetRotation(GetRotation() + 0.5);
 
 		// Reset laser cooldown (half second)
 		mLaserCooldown = 0.5f;

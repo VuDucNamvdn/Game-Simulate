@@ -32,6 +32,7 @@ void AnimSpriteComponent::Update(float deltaTime)
 		}
 		// Set the current texture
 		SetTexture(mAnimTextures[static_cast<int>(mCurrFrame)]);
+		mAnimTextures.pop_back();
 	}
 }
 
@@ -44,4 +45,9 @@ void AnimSpriteComponent::SetAnimTextures(const std::vector<SDL_Texture*>& textu
 		mCurrFrame = 0.0f;
 		SetTexture(mAnimTextures[0]);
 	}
+}
+
+void AnimSpriteComponent::PlayAnim(const char * animName)
+{
+	SetAnimTextures(animations[animName]);
 }

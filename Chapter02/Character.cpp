@@ -1,13 +1,18 @@
 #include "Character.h"
+#include "AnimSpriteComponent.h"
 #include "Game.h"
 
 
 Character::Character(Game* game): Actor(game), mRightSpeed(0.0f)
 , mDownSpeed(0.0f)
 {
+	bIsJump = false;
 	// Create an animated sprite component
 	asc = new AnimSpriteComponent(this);
 	std::vector<SDL_Texture*> Idle = {
+		game->GetTexture("Assets/Character01.png"),
+	};
+	std::vector<SDL_Texture*> Walk = {
 		game->GetTexture("Assets/Character01.png"),
 		game->GetTexture("Assets/Character02.png"),
 		game->GetTexture("Assets/Character03.png"),
@@ -28,11 +33,12 @@ Character::Character(Game* game): Actor(game), mRightSpeed(0.0f)
 		game->GetTexture("Assets/Character17.png"),
 		game->GetTexture("Assets/Character18.png"),
 	};
-	animations.emplace("Idle", Idle);
-	animations.emplace("Jump", Jump);
-	animations.emplace("Punch", Punch);
+	asc->animations.emplace("Idle", Idle);
+	asc->animations.emplace("Walk", Walk);
+	asc->animations.emplace("Jump", Jump);
+	asc->animations.emplace("Punch", Punch);
 
-	asc->SetAnimTextures(Idle);
+	asc->PlayAnim("Idle");
 }
 
 void Character::UpdateActor(float deltaTime)
@@ -45,19 +51,19 @@ void Character::UpdateActor(float deltaTime)
 	// Restrict position to left half of screen
 	if (pos.x < 25.0f)
 	{
-		pos.x = 25.0f;
+		pos.x = 990.0f;
 	}
-	else if (pos.x > 500.0f)
+	else if (pos.x > 1024.0f)
 	{
-		pos.x = 500.0f;
+		pos.x = 25.0f;
 	}
 	if (pos.y < 25.0f)
 	{
-		pos.y = 25.0f;
+		pos.y = 743.0f;
 	}
 	else if (pos.y > 743.0f)
 	{
-		pos.y = 743.0f;
+		pos.y = 25.0f;
 	}
 	SetPosition(pos);
 	
@@ -69,42 +75,55 @@ void Character::ProcessKeyboard(const uint8_t * state)
 	mRightSpeed = 0.0f;
 	mDownSpeed = 0.0f;
 	// right/left
-	if (state[SDL_SCANCODE_D])
+	if (state[SDL_SCANCODE_RIGHT])
 	{
 		mRightSpeed += 250.0f;
 
+		asc->flip = SDL_FLIP_NONE;
+
+
 	}
-	if (state[SDL_SCANCODE_A])
+	if (state[SDL_SCANCODE_LEFT])
 	{
 		mRightSpeed -= 250.0f;
+
+		asc->flip = SDL_FLIP_HORIZONTAL;
 	}
 	// up/down
-	if (state[SDL_SCANCODE_S])
+	if (state[SDL_SCANCODE_DOWN])
 	{
 		mDownSpeed += 300.0f;
 	}
-	if (state[SDL_SCANCODE_W])
+	if (state[SDL_SCANCODE_UP])
 	{
 		mDownSpeed -= 300.0f;
 	}
+	if (!state[SDL_SCANCODE_SPACE])
+	{
+		bIsJump = false;
+	}
 	if (state[SDL_SCANCODE_SPACE])
 	{
-		PlayAnim("Jump");
+		if (!bIsJump)
+		{
+			asc->PlayAnim("Jump");
+			bIsJump = true;
+		}
 	}
 	else if (state[SDL_SCANCODE_T])
 	{
-		PlayAnim("Punch");
+		asc->PlayAnim("Punch");
+	}
+	else if (state[SDL_SCANCODE_RIGHT]|| state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_UP] || state[SDL_SCANCODE_DOWN])
+	{
+		asc->PlayAnim("Walk");
 	}
 	else
 	{
-		PlayAnim("Idle");
+		asc->PlayAnim("Idle");
 	}
 	
 }
 
-void Character::PlayAnim(const char * animName)
-{
-	asc->SetAnimTextures(animations[animName]);
-}
 
 

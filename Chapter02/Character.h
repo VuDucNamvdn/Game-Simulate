@@ -1,8 +1,6 @@
 #pragma once
 #include "Actor.h"
-#include "AnimSpriteComponent.h"
 #include <iostream> 
-#include <time.h>
 class Character :
 	public Actor
 {
@@ -12,12 +10,10 @@ public:
 	void ProcessKeyboard(const uint8_t* state);
 	float GetRightSpeed() const { return mRightSpeed; }
 	float GetDownSpeed() const { return mDownSpeed; }
-	void PlayAnim(const char* animName);
-	void Sleep(float s);
 private:
 	float mRightSpeed;
 	float mDownSpeed;
 	class AnimSpriteComponent* asc ;
-	std::map<const char*, std::vector<SDL_Texture*>> animations;
+	bool bIsJump;
 };
 

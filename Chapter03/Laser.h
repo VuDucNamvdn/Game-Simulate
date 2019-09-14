@@ -14,6 +14,7 @@ public:
 	Laser(class Game* game);
 
 	void UpdateActor(float deltaTime) override;
+	class MoveComponent* mc;
 private:
 	class CircleComponent* mCircle;
 	float mDeathTimer;
