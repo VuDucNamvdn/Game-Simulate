@@ -170,8 +170,8 @@ void Game::GenerateOutput()
 	SDL_Rect Score_board;
 	Score_board.x = 20;
 	Score_board.y = 20;
-	Score_board.w = 15;
-	Score_board.h = 15;
+	Score_board.w = 50;
+	Score_board.h = 50;
 
 	SDL_RenderCopy(mRenderer, mTexture, NULL, &Score_board);
 	SDL_RenderPresent(mRenderer);
