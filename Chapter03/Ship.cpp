@@ -13,6 +13,7 @@
 #include "Laser.h"
 #include "CircleComponent.h"
 #include "Asteroid.h"
+#include "Pros.h"
 
 Ship::Ship(Game* game)
 	:Actor(game)
@@ -46,8 +47,8 @@ void Ship::UpdateActor(float deltaTime)
 		{
 			// The first asteroid we intersect with,
 			// set ourselves and the asteroid to dead
-			SetScale(GetScale()-0.2f);
-			mCircle->SetRadius(mCircle->GetRadius() - 0.2f);
+			SetScale(GetScale()-0.1f);
+			
 			if (GetScale()<=0.2f)
 			{
 				SetState(EDead);
@@ -63,26 +64,41 @@ void Ship::ActorInput(const uint8_t* keyState)
 	if (keyState[SDL_SCANCODE_SPACE] && mLaserCooldown <= 0.0f)
 	{
 		// Create a laser and set its position/rotation to mine
-		Laser* laser = new Laser(GetGame());
-		laser->SetPosition(GetPosition());
-		laser->SetRotation(GetRotation());
+		
+		if (GetSpawn()==EA)
+		{
+			Laser* lasers = new Laser(GetGame());
+			lasers->SetPosition(GetPosition());
+			lasers->SetRotation(GetRotation());
+		}
+		else if (GetSpawn()==ES)
+		{
+			Laser* laser = new Laser(GetGame());
+			laser->SetPosition(GetPosition());
+			laser->SetRotation(GetRotation());
 
-		Laser* laser2 = new Laser(GetGame());
-		laser2->SetPosition(GetPosition());
-		laser2->SetRotation(GetRotation()-1);
+			Laser* laser2 = new Laser(GetGame());
+			laser2->SetPosition(GetPosition());
+			laser2->SetRotation(GetRotation() - 1);
 
-		Laser* laser3 = new Laser(GetGame());
-		laser3->SetPosition(GetPosition());
-		laser3->SetRotation(GetRotation() - 0.5);
+			Laser* laser3 = new Laser(GetGame());
+			laser3->SetPosition(GetPosition());
+			laser3->SetRotation(GetRotation() - 0.5);
 
-		Laser* laser4 = new Laser(GetGame());
-		laser4->SetPosition(GetPosition());
-		laser4->SetRotation(GetRotation()+1);
+			Laser* laser4 = new Laser(GetGame());
+			laser4->SetPosition(GetPosition());
+			laser4->SetRotation(GetRotation() + 1);
 
-		Laser* laser5 = new Laser(GetGame());
-		laser5->SetPosition(GetPosition());
-		laser5->SetRotation(GetRotation() + 0.5);
-
+			Laser* laser5 = new Laser(GetGame());
+			laser5->SetPosition(GetPosition());
+			laser5->SetRotation(GetRotation() + 0.5);
+		}
+		else
+		{
+			Laser* laser = new Laser(GetGame());
+			laser->SetPosition(GetPosition());
+			laser->SetRotation(GetRotation());
+		}
 		// Reset laser cooldown (half second)
 		mLaserCooldown = 0.5f;
 	}

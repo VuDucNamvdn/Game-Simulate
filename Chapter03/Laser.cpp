@@ -12,7 +12,8 @@
 #include "Game.h"
 #include "CircleComponent.h"
 #include "Asteroid.h"
-
+#include "Pros.h"
+#include "Random.h"
 Laser::Laser(Game* game)
 	:Actor(game)
 	,mDeathTimer(1.0f)
@@ -45,10 +46,27 @@ void Laser::UpdateActor(float deltaTime)
 		{
 			if (Intersect(*mCircle, *(ast->GetCircle())))
 			{
+				int random = Random::GetIntRange(0, 5);
+				if (random==5)
+				{
+					Pros *pro = new Pros(GetGame(), ES);
+					pro->SetPosition(GetPosition());
+				}
+				else if (random == 1)
+				{
+					Pros *pro = new Pros(GetGame(), EA);
+					pro->SetPosition(GetPosition());
+				}
+				else if (random == 2)
+				{
+					Pros *pro = new Pros(GetGame(), Gold);
+					pro->SetPosition(GetPosition());
+				}
 				// The first asteroid we intersect with,
 				// set ourselves and the asteroid to dead
 				SetState(EDead);
 				ast->SetState(EDead);
+				
 				GetGame()->score += 10;
 				break;
 			}

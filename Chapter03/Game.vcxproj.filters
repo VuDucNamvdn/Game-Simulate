@@ -46,6 +46,9 @@
     <ClCompile Include="Laser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Pros.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h">
@@ -84,5 +87,6 @@
     <ClInclude Include="Laser.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Pros.h" />
   </ItemGroup>
 </Project>
