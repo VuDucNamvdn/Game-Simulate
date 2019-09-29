@@ -20,7 +20,12 @@ public:
 		EPaused,
 		EDead
 	};
-
+	enum Spawn
+	{
+		EA,
+		ES,
+		Gold
+	};
 	Actor(class Game* game);
 	virtual ~Actor();
 
@@ -49,6 +54,9 @@ public:
 	State GetState() const { return mState; }
 	void SetState(State state) { mState = state; }
 
+	Spawn GetSpawn() const { return mSpawn; }
+	void SetSpawn(Spawn spawn) { mSpawn = spawn; }
+
 	class Game* GetGame() { return mGame; }
 
 
@@ -58,7 +66,7 @@ public:
 private:
 	// Actor's state
 	State mState;
-
+	Spawn mSpawn;
 	// Transform
 	Vector2 mPosition;
 	float mScale;

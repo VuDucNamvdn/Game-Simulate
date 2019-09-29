@@ -14,6 +14,7 @@
 #include "Ship.h"
 #include "Asteroid.h"
 #include "Random.h"
+#include "Pros.h"
 Game::Game()
 :mWindow(nullptr)
 ,mRenderer(nullptr)
@@ -74,6 +75,11 @@ void Game::RunLoop()
 		UpdateGame();
 		GenerateOutput();
 	}
+}
+
+Ship * Game::GetShip()
+{
+	return mShip;
 }
 
 void Game::ProcessInput()
@@ -170,8 +176,8 @@ void Game::GenerateOutput()
 	SDL_Rect Score_board;
 	Score_board.x = 20;
 	Score_board.y = 20;
-	Score_board.w = 15;
-	Score_board.h = 15;
+	Score_board.w = 20;
+	Score_board.h = 20;
 
 	SDL_RenderCopy(mRenderer, mTexture, NULL, &Score_board);
 	SDL_RenderPresent(mRenderer);
@@ -258,6 +264,21 @@ void Game::RemoveAsteroid(Asteroid* ast)
 	if (mIsRunning)
 	{
 		new Asteroid(this);
+	}
+}
+
+void Game::AddPro(Pros * pro)
+{
+	mPros.emplace_back(pro);
+}
+
+void Game::RemovePro(Pros * ast)
+{
+	auto iter = std::find(mPros.begin(),
+		mPros.end(), ast);
+	if (iter != mPros.end())
+	{
+		mPros.erase(iter);
 	}
 }
 

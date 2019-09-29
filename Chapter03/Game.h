@@ -36,7 +36,15 @@ public:
 	void AddAsteroid(class Asteroid* ast);
 	void RemoveAsteroid(class Asteroid* ast);
 	std::vector<class Asteroid*>& GetAsteroids() { return mAsteroids; }
+
+	// Game-specific (add/remove pros)
+	void AddPro(class Pros* pro);
+	void RemovePro(class Pros* pro);
+	std::vector<class Pros*>& GetPros() { return mPros; }
+
 	int score;
+
+	class Ship* GetShip();
 private:
 	void ProcessInput();
 	void UpdateGame();
@@ -65,6 +73,7 @@ private:
 	// Game-specific
 	class Ship* mShip; // Player's ship
 	std::vector<class Asteroid*> mAsteroids;
+	std::vector<class Pros*> mPros;
 	//surface to render score
 	SDL_Surface * mSurface;
 	SDL_Texture * mTexture;
