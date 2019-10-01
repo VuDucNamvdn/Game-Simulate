@@ -18,7 +18,6 @@
 #include "Ship.h"
 #include "Asteroid.h"
 #include "Random.h"
-
 Game::Game()
 :mWindow(nullptr)
 ,mSpriteShader(nullptr)
@@ -35,7 +34,6 @@ bool Game::Initialize()
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
 		return false;
 	}
-	
 	// Set OpenGL attributes
 	// Use the core OpenGL profile
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -51,7 +49,12 @@ bool Game::Initialize()
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	// Force OpenGL to use hardware acceleration
 	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-	
+	//////////////////
+	////////////////////
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	/////////////////////
+	////////////////////
 	mWindow = SDL_CreateWindow("Game Programming in C++ (Chapter 5)", 100, 100,
 							   1024, 768, SDL_WINDOW_OPENGL);
 	if (!mWindow)
@@ -135,13 +138,18 @@ void Game::UpdateGame()
 	// Wait until 16ms has elapsed since last frame
 	while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16))
 		;
-
 	float deltaTime = (SDL_GetTicks() - mTicksCount) / 1000.0f;
+	current_time += 1 * deltaTime;
+	if (current_time == 360)
+	{
+		current_time = 0;
+	}
 	if (deltaTime > 0.05f)
 	{
 		deltaTime = 0.05f;
 	}
 	mTicksCount = SDL_GetTicks();
+
 
 	// Update all actors
 	mUpdatingActors = true;
@@ -179,10 +187,33 @@ void Game::UpdateGame()
 void Game::GenerateOutput()
 {
 	// Set the clear color to grey
-	glClearColor(0.86f, 0.86f, 0.86f, 1.0f);
+	//glClearColor(0.86f, 0.86f, 0.86f, 1.0f);
+	
+
+	/////////////////////////////////////////
+	//////////////////////////////////////
+	/////////TEST////////////////
+	glClearColor((float)sin(current_time), (float)sin(2*current_time),(float)cos(current_time),1.0f);
+
+	////////////////////////////
+	/////////////////////////////////////////////
+	////////////////////////////////////////
 	// Clear the color buffer
 	glClear(GL_COLOR_BUFFER_BIT);
-	
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	//Move to center of the screen
+	glTranslatef(1024 / 2.f, 768 / 2.f, 0.f);
+	//RYGB Mix
+	glBegin(GL_QUADS);
+	glColor3f(1.f, 0.f, 0.f); glVertex2f(-50.f, -50.f);
+	glColor3f(1.f, 1.f, 0.f); glVertex2f(50.f, -50.f);
+	glColor3f(0.f, 1.f, 0.f); glVertex2f(50.f, 50.f);
+	glColor3f(0.f, 0.f, 1.f); glVertex2f(-50.f, 50.f);
+	glEnd();
+
+
 	// Draw all sprite components
 	// Enable alpha blending on the color buffer
 	glEnable(GL_BLEND);
@@ -198,6 +229,7 @@ void Game::GenerateOutput()
 
 	// Swap the buffers
 	SDL_GL_SwapWindow(mWindow);
+	
 }
 
 bool Game::LoadShaders()

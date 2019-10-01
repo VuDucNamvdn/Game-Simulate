@@ -16,6 +16,7 @@
 class Game
 {
 public:
+
 	Game();
 	bool Initialize();
 	void RunLoop();
@@ -33,6 +34,7 @@ public:
 	void AddAsteroid(class Asteroid* ast);
 	void RemoveAsteroid(class Asteroid* ast);
 	std::vector<class Asteroid*>& GetAsteroids() { return mAsteroids; }
+	int back;
 private:
 	void ProcessInput();
 	void UpdateGame();
@@ -68,4 +70,6 @@ private:
 	// Game-specific
 	class Ship* mShip;
 	std::vector<class Asteroid*> mAsteroids;
+
+	double current_time=0;
 };
