@@ -72,4 +72,5 @@ private:
 	std::vector<class Asteroid*> mAsteroids;
 
 	double current_time=0;
+	unsigned int VBO, VAO;
 };

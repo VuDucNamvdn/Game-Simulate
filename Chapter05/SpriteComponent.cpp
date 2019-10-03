@@ -47,7 +47,7 @@ void SpriteComponent::Draw(Shader* shader)
 		// Set current texture
 		mTexture->SetActive();
 		// Draw quad
-		glDrawElements(GL_TRIANGLES, 60, GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 	}
 }
 

@@ -203,15 +203,7 @@ void Game::GenerateOutput()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	//Move to center of the screen
-	glTranslatef(1024 / 2.f, 768 / 2.f, 0.f);
-	//RYGB Mix
-	glBegin(GL_QUADS);
-	glColor3f(1.f, 0.f, 0.f); glVertex2f(-50.f, -50.f);
-	glColor3f(1.f, 1.f, 0.f); glVertex2f(50.f, -50.f);
-	glColor3f(0.f, 1.f, 0.f); glVertex2f(50.f, 50.f);
-	glColor3f(0.f, 0.f, 1.f); glVertex2f(-50.f, 50.f);
-	glEnd();
+	
 
 
 	// Draw all sprite components
@@ -224,9 +216,10 @@ void Game::GenerateOutput()
 	mSpriteVerts->SetActive();
 	for (auto sprite : mSprites)
 	{
-		sprite->Draw(mSpriteShader);
+		//sprite->Draw(mSpriteShader);
 	}
-
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 	// Swap the buffers
 	SDL_GL_SwapWindow(mWindow);
 	
@@ -260,6 +253,20 @@ void Game::CreateSpriteVerts()
 		0, 1, 2,
 		2, 3, 0
 	};
+	
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	// position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	// color attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	mSpriteVerts = new VertexArray(vertices, 4, indices, 6);
 }
